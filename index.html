@@ -11,6 +11,27 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800&family=Playwrite+ES:wght@100..400&family=Caveat:wght@400;700&display=swap"
         rel="stylesheet">
+    <style>
+        /* Fallbacks para modo offline (cuando no carga Google Fonts) */
+        :root {
+            --font-main: 'Nunito', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-cursive: 'Playwrite ES', 'Comic Sans MS', 'Comic Sans', cursive;
+            --font-hand: 'Caveat', 'Brush Script MT', cursive;
+        }
+
+        body {
+            font-family: var(--font-main);
+        }
+
+        .font-escolar,
+        .font-ligada {
+            font-family: var(--font-cursive);
+        }
+
+        .pizarra-label {
+            font-family: var(--font-hand);
+        }
+    </style>
 </head>
 
 <body>
