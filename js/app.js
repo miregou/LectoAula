@@ -372,6 +372,16 @@ class LectoApp {
         }
 
         this.init();
+
+        // Portal Bridge
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'INIT_USER') {
+                this.activeUser = event.data.user;
+                this.score = event.data.user.scores.lecto || 0;
+                const scoreEl = document.getElementById('score');
+                if (scoreEl) scoreEl.innerText = this.score;
+            }
+        });
     }
 
     init() {
@@ -1055,6 +1065,15 @@ class LectoApp {
         if (fromDigitalInput) {
             this.elements.instruction.innerHTML = `<span class="feedback-success">¡Muy bien! Escrito correctamente.</span>`;
             this.score += 10;
+
+            // Send to Portal
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'UPDATE_SCORE',
+                    app: 'lecto',
+                    score: this.score
+                }, '*');
+            }
             this.elements.score.innerText = this.score;
             this.roundFinished = true;
             this.playSound('applause');
@@ -1071,6 +1090,15 @@ class LectoApp {
         }
         this.elements.instruction.innerHTML = `<span class="feedback-success">¡Muy bien! Estás aprendiendo mucho.</span>`;
         this.score += 10;
+
+        // Send to Portal
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'UPDATE_SCORE',
+                app: 'lecto',
+                score: this.score
+            }, '*');
+        }
         this.elements.score.innerText = this.score;
         this.roundFinished = true;
         this.playSound('applause');
@@ -2552,6 +2580,15 @@ class LectoApp {
     handleSuccess() {
         this.roundFinished = true;
         this.score += 10;
+
+        // Send to Portal
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'UPDATE_SCORE',
+                app: 'lecto',
+                score: this.score
+            }, '*');
+        }
         this.elements.score.innerText = this.score;
         this.elements.instruction.innerHTML = `<span class="feedback-success">¡EXCELENTE! ⭐</span>`;
         this.playSound('applause');
@@ -2568,6 +2605,15 @@ class LectoApp {
         // Mostrar la palabra correcta como feedback
         this.elements.instruction.innerHTML = `<span class="feedback-success">¡Muy bien! La palabra era: ${this.formatWord(this.currentWord)}</span>`;
         this.score += 10;
+
+        // Send to Portal
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'UPDATE_SCORE',
+                app: 'lecto',
+                score: this.score
+            }, '*');
+        }
         this.elements.score.innerText = this.score;
         this.roundFinished = true;
         this.playSound('applause');
