@@ -62,7 +62,7 @@ class LectoApp {
                 { word: 'grupo', emoji: '👥', silabas: ['gru', 'po'] },
                 { word: 'drama', emoji: '🎭', silabas: ['dra', 'ma'] },
                 // Bisílabas con consonantes que se separan (al-to, ar-bol)
-                { word: 'arbol', emoji: '🌲', silabas: ['ár', 'bol'] },
+                { word: 'árbol', emoji: '🌲', silabas: ['ár', 'bol'] },
                 { word: 'alto', emoji: '📏', silabas: ['al', 'to'] },
                 // Trisílabas
                 { word: 'piedra', emoji: '🪨', silabas: ['pie', 'dra'] },
@@ -89,9 +89,9 @@ class LectoApp {
                 { word: 'escalera', emoji: '🪜', silabas: ['es', 'ca', 'le', 'ra'] },
                 { word: 'cocodrilo', emoji: '🐊', silabas: ['co', 'co', 'dri', 'lo'] },
                 { word: 'dinosaurio', emoji: '🦕', silabas: ['di', 'no', 'sau', 'rio'] },
-                { word: 'helicoptero', emoji: '🚁', silabas: ['he', 'li', 'cóp', 'te', 'ro'] },
-                { word: 'semaforo', emoji: '🚦', silabas: ['se', 'má', 'fo', 'ro'] },
-                { word: 'telefono', emoji: '📞', silabas: ['te', 'lé', 'fo', 'no'] },
+                { word: 'helicóptero', emoji: '🚁', silabas: ['he', 'li', 'cóp', 'te', 'ro'] },
+                { word: 'semáforo', emoji: '🚦', silabas: ['se', 'má', 'fo', 'ro'] },
+                { word: 'teléfono', emoji: '📞', silabas: ['te', 'lé', 'fo', 'no'] },
                 { word: 'ordenador', emoji: '💻', silabas: ['or', 'de', 'na', 'dor'] },
                 // Pentasílabas
                 { word: 'refrigerador', emoji: '🧊', silabas: ['re', 'fri', 'ge', 'ra', 'dor'] },
@@ -119,7 +119,7 @@ class LectoApp {
         this.categories = {
             animales: ['gato', 'perro', 'pato', 'oso', 'pez', 'tigre'],
             cosas: ['mesa', 'casa', 'libro', 'plato', 'silla', 'cama'],
-            frutas: ['manzana', 'pera', 'uva', 'fresa', 'platano', 'naranja'],
+            frutas: ['manzana', 'pera', 'uva', 'fresa', 'plátano', 'naranja'],
             colores: ['rojo', 'azul', 'verde', 'amarillo', 'rosa', 'negro']
         };
 
@@ -218,9 +218,9 @@ class LectoApp {
             },
             {
                 texto: 'Oro parece,\nplata no es.\nAbran las cortinas\ny verán lo que es.',
-                respuesta: 'platano',
+                respuesta: 'plátano',
                 opciones: [
-                    { texto: 'platano', emoji: '🍌' },
+                    { texto: 'plátano', emoji: '🍌' },
                     { texto: 'naranja', emoji: '🍊' },
                     { texto: 'limón', emoji: '🍋' }
                 ],
@@ -373,11 +373,22 @@ class LectoApp {
 
         this.init();
 
+        // Mapeo de actividades
+        this.activityNames = {
+            lectura: 'Lectura Exploradora',
+            silabas: 'Sílabas Perdidas',
+            ahorcado: 'Ahorcado Ninja',
+            dictado: 'Dictado Mágico',
+            parejas: 'Parejas de Palabras',
+            ordena: 'Ordena la Palabra',
+            escribe: 'Escritura Libre'
+        };
+
         // Portal Bridge
         window.addEventListener('message', (event) => {
             if (event.data.type === 'INIT_USER') {
                 this.activeUser = event.data.user;
-                this.score = event.data.user.scores.lecto || 0;
+                this.score = event.data.user.points || 0;
                 const scoreEl = document.getElementById('score');
                 if (scoreEl) scoreEl.innerText = this.score;
             }
@@ -398,6 +409,7 @@ class LectoApp {
         window.resetRound = () => this.resetRound();
         window.generateExercise = () => this.generateExercise();
         window.clearCanvas = () => this.clearCanvas();
+        window.reportToPortal = (ok) => this.reportToPortal(ok);
         window.setPenColor = (color) => this.setPenColor(color);
         window.checkWriting = () => this.checkWriting();
         window.speakCurrentWord = () => this.speakWord(this.currentWord);
@@ -438,6 +450,18 @@ class LectoApp {
         window.startEquipoRound = () => this.startEquipoRound();
         window.selectEquipoSyllable = (player, syl) => this.selectEquipoSyllable(player, syl);
         window.restartEquipo = () => this.restartEquipo();
+    }
+
+    reportToPortal(ok) {
+        if (window.parent !== window) {
+            window.parent.postMessage({
+                type: 'UPDATE_SCORE_DETAILED',
+                app: 'lecto',
+                score: this.score,
+                activity: this.activityNames[this.gameMode] || this.gameMode,
+                ok: ok
+            }, '*');
+        }
     }
 
     // === FORMATEO DE TEXTO ===
@@ -628,6 +652,8 @@ class LectoApp {
         this.clearCanvas();
         this.elements.instruction.className = 'instruction-pill instruction-active';
 
+        // Speak current word automatically on start
+
         const vocab = this.vocabulary[this.currentDifficulty];
         const randomItem = vocab[Math.floor(Math.random() * vocab.length)];
         this.currentWord = randomItem.word;
@@ -656,6 +682,8 @@ class LectoApp {
             case 'equipo': this.genEquipo(); break;
             default: this.elements.exerciseContainer.innerHTML = '<p>Actividad no encontrada</p>';
         }
+
+        setTimeout(() => this.scanningManager.refresh(), 200);
     }
 
     // === ACTIVIDADES DE LECTURA ===
@@ -760,13 +788,13 @@ class LectoApp {
         const fontClass = this.getFontClass();
         this.elements.instruction.innerText = 'Toca una imagen y luego su palabra';
 
-        let html = `<div class="animate-pop fullscreen-activity" style="display:flex; flex-direction:column; gap:2.5rem; align-items:center;">`;
-        html += `<div style="display:flex; gap:1.5rem; flex-wrap:wrap; justify-content:center;">`;
+        let html = `<div class="animate-pop fullscreen-activity" style="display:flex; flex-direction:column; gap:1rem; align-items:center; width:100%;">`;
+        html += `<div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; width:100%;">`;
         items.forEach((item, i) => {
             html += `<div class="image-card large-card" onclick="selectImageWord('img_${i}')" id="img_${i}" data-word="${item.word}">${item.emoji}</div>`;
         });
         html += `</div>`;
-        html += `<div style="display:flex; gap:1.5rem; flex-wrap:wrap; justify-content:center;">`;
+        html += `<div style="display:flex; gap:0.75rem; flex-wrap:wrap; justify-content:center; width:100%;">`;
         shuffledWords.forEach((item, i) => {
             html += `<div class="word-card large-card ${fontClass}" onclick="selectImageWord('word_${i}')" id="word_${i}" data-word="${item.word}">${this.formatWord(item.word)}</div>`;
         });
@@ -866,6 +894,30 @@ class LectoApp {
                 gap.innerText = '';
                 gap.style.background = '';
             }, 500);
+        }
+    }
+
+    checkAnswer(userWord) {
+        if (this.roundFinished) return;
+        const correct = userWord.toLowerCase().trim() === this.currentWord.toLowerCase().trim();
+
+        if (correct) {
+            this.points += 10;
+            this.roundFinished = true;
+            this.elements.instruction.innerText = "¡Excelente!";
+            this.elements.instruction.className = 'instruction-pill success-pop';
+            this.reportToPortal(true);
+
+            // Narrate on success
+
+            setTimeout(() => this.generateExercise(), 1500);
+        } else {
+            this.elements.instruction.innerText = "Sigue intentándolo";
+            this.elements.instruction.className = 'instruction-pill error-shake';
+            setTimeout(() => {
+                this.elements.instruction.innerText = "Escribe la palabra";
+                this.elements.instruction.className = 'instruction-pill instruction-active';
+            }, 1000);
         }
     }
 
@@ -1012,8 +1064,8 @@ class LectoApp {
         html += `</div>`;
         this.elements.exerciseContainer.innerHTML = html;
 
-        // Auto-reproducir audio al inicio
-        setTimeout(() => this.speakWord(this.currentWord), 500);
+        // Auto-reproducir audio al inicio (DESACTIVADO POR PETICIÓN DEL USUARIO)
+        // setTimeout(() => this.speakWord(this.currentWord), 500);
     }
 
     selectDictadoSyllable(syl, index) {
@@ -1066,14 +1118,7 @@ class LectoApp {
             this.elements.instruction.innerHTML = `<span class="feedback-success">¡Muy bien! Escrito correctamente.</span>`;
             this.score += 10;
 
-            // Send to Portal
-            if (window.parent !== window) {
-                window.parent.postMessage({
-                    type: 'UPDATE_SCORE',
-                    app: 'lecto',
-                    score: this.score
-                }, '*');
-            }
+            this.reportToPortal(true);
             this.elements.score.innerText = this.score;
             this.roundFinished = true;
             this.playSound('applause');
@@ -1086,19 +1131,12 @@ class LectoApp {
         if (!this.hasDrawn) {
             this.elements.instruction.innerHTML = `<span class="feedback-error">¡Escribe algo primero!</span>`;
             this.playSound('error');
+            this.reportToPortal(false);
             return;
         }
         this.elements.instruction.innerHTML = `<span class="feedback-success">¡Muy bien! Estás aprendiendo mucho.</span>`;
         this.score += 10;
-
-        // Send to Portal
-        if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'UPDATE_SCORE',
-                app: 'lecto',
-                score: this.score
-            }, '*');
-        }
+        this.reportToPortal(true);
         this.elements.score.innerText = this.score;
         this.roundFinished = true;
         this.playSound('applause');
@@ -1118,7 +1156,8 @@ class LectoApp {
         html += `</div>`;
 
         this.elements.exerciseContainer.innerHTML = html;
-        this.speakWord(this.currentWord);
+        // DESACTIVADO: Lectura automática por petición del usuario
+        // this.speakWord(this.currentWord);
     }
 
     genOraciones() {
@@ -1138,7 +1177,7 @@ class LectoApp {
         this.elements.instruction.innerText = 'Lee la oración';
         const fontClass = this.getFontClass();
 
-        let html = `<div class="animate-pop fullscreen-activity" style="display:flex; flex-direction:column; align-items:center; gap:3rem; justify-content:center; height:100%;">`;
+        let html = `<div class="animate-pop fullscreen-activity" style="display:flex; flex-direction:column; align-items:center; gap:1.5rem; justify-content:center; height:100%; width:100%;">`;
         html += `<div class="reading-text ${fontClass}" style="font-size:2.5rem; text-align:center;">${sentence}</div>`;
         html += `<div style="display:flex; gap:1rem;">`;
         html += `<button class="btn-sound large-btn" onclick="speakWord('${sentence}')">🔊 Leer</button>`;
@@ -1674,7 +1713,8 @@ class LectoApp {
 
         this.elements.exerciseContainer.innerHTML = html;
 
-        setTimeout(() => this.speakWord(this.currentWord), 300);
+        // DESACTIVADO: Lectura automática por petición del usuario
+        // setTimeout(() => this.speakWord(this.currentWord), 300);
     }
 
     countSyllable() {
@@ -2580,40 +2620,23 @@ class LectoApp {
     handleSuccess() {
         this.roundFinished = true;
         this.score += 10;
-
-        // Send to Portal
-        if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'UPDATE_SCORE',
-                app: 'lecto',
-                score: this.score
-            }, '*');
-        }
+        this.reportToPortal(true);
         this.elements.score.innerText = this.score;
         this.elements.instruction.innerHTML = `<span class="feedback-success">¡EXCELENTE! ⭐</span>`;
         this.playSound('applause');
     }
 
     checkWriting() {
-        // Verificar que se ha dibujado algo en el canvas
         if (!this.hasDrawn) {
             this.elements.instruction.innerHTML = `<span class="feedback-error">¡Escribe algo primero!</span>`;
             this.playSound('error');
+            this.reportToPortal(false);
             return;
         }
 
-        // Mostrar la palabra correcta como feedback
         this.elements.instruction.innerHTML = `<span class="feedback-success">¡Muy bien! La palabra era: ${this.formatWord(this.currentWord)}</span>`;
         this.score += 10;
-
-        // Send to Portal
-        if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'UPDATE_SCORE',
-                app: 'lecto',
-                score: this.score
-            }, '*');
-        }
+        this.reportToPortal(true);
         this.elements.score.innerText = this.score;
         this.roundFinished = true;
         this.playSound('applause');
@@ -2798,6 +2821,7 @@ window.checkSyllableCount = function () {
         document.querySelectorAll('.count-btn').forEach(btn => btn.classList.remove('active'));
     }
 };
+
 
 // Inicializar aplicación
 const app = new LectoApp();

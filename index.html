@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>LectoAula - Lectoescritura 1º Primaria</title>
+    <title>Nexia: Letras - Lectoescritura 1º Primaria</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,8 +42,10 @@
                 <div class="header-top">
                     <button class="btn-curriculum" onclick="openCurriculumModal()">📋 Currículo</button>
                 </div>
-                <h1 class="app-title">LECTOAULA 📚</h1>
-                <p class="app-subtitle">PIZARRA TÁCTIL DE LECTOESCRITURA</p>
+                <div class="brand-container" style="display:flex; flex-direction:column; align-items:center;">
+                    <img src="img/nexia_logo.png" alt="Nexia Logo" style="height: 80px; margin-bottom: 10px;">
+                    <p class="app-subtitle" style="margin-top:0;">LECTOAULA - PIZARRA TÁCTIL DE LECTOESCRITURA</p>
+                </div>
             </div>
             <div class="menu-grid">
                 <!-- LECTURA -->
@@ -289,7 +291,8 @@
             <div class="game-header">
                 <div class="header-left">
                     <button onclick="goToMenu()" class="btn-nav">🏠 MENÚ</button>
-                    <button onclick="speakCurrentWord()" class="btn-nav btn-audio" id="btn-speak">🔊 ESCUCHAR</button>
+                    <!-- Elemento necesario para JS pero oculto permanentemente -->
+                    <button id="btn-speak" style="display:none !important;"></button>
                     <button onclick="openFontSettings()" class="btn-nav btn-font">Aa LETRA</button>
                 </div>
                 <div class="header-center">

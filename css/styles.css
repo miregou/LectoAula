@@ -52,7 +52,7 @@ body {
 body {
     font-family: 'Nunito', 'Comic Sans MS', sans-serif;
     background: var(--bg-gradient);
-    min-height: 100vh;
+    height: 100vh;
     margin: 0;
     overflow: hidden;
     color: var(--neutral-800);
@@ -84,7 +84,7 @@ body {
 }
 
 .app-header {
-    padding: 1rem 1.5rem;
+    padding: 0.5rem 1rem;
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
     text-align: center;
     box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
@@ -157,11 +157,11 @@ body {
 /* === VISTA JUEGO === */
 .game-header {
     background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 55px;
+    min-height: 45px;
     box-shadow: 0 3px 10px rgba(139, 92, 246, 0.2);
 }
 
@@ -288,11 +288,11 @@ body {
 
 /* Instrucción */
 .instruction-pill {
-    margin: 0 auto 1rem;
-    padding: 0.6rem 1.5rem;
+    margin: 0 auto 0.5rem;
+    padding: 0.4rem 1.2rem;
     border-radius: var(--radius-full);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.9rem;
     text-align: center;
     box-shadow: var(--shadow-sm);
     max-width: 90%;
@@ -323,15 +323,16 @@ body {
     justify-content: center;
     flex-direction: column;
     width: 100%;
-    padding: 1rem;
+    padding: 0.25rem 0.5rem;
     overflow-y: auto;
+    max-height: calc(100vh - 140px);
 }
 
 #action-section {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 0.5rem;
 }
 
 .btn-game-action {
@@ -339,11 +340,11 @@ body {
     border: none;
     color: white;
     font-weight: 800;
-    padding: 0.9rem 2.5rem;
+    padding: 0.6rem 2rem;
     border-radius: var(--radius-md);
     cursor: pointer;
-    font-size: 1rem;
-    box-shadow: 0 4px 0 var(--secondary-dark), 0 6px 15px rgba(249, 115, 22, 0.3);
+    font-size: 0.9rem;
+    box-shadow: 0 3px 0 var(--secondary-dark), 0 5px 12px rgba(249, 115, 22, 0.3);
     transition: all 0.1s;
 }
 
@@ -504,13 +505,14 @@ body {
     background: var(--white);
     border: 3px solid var(--primary-light);
     border-radius: var(--radius-md);
-    padding: 0.75rem 1.25rem;
-    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    font-size: clamp(1rem, 4vh, 1.5rem);
     font-weight: 700;
     cursor: grab;
     box-shadow: var(--shadow-card);
     transition: all 0.15s;
     touch-action: none;
+    max-width: 90%;
 }
 
 .word-card:active {
@@ -540,16 +542,17 @@ body {
     background: var(--white);
     border: 4px solid var(--secondary-light);
     border-radius: var(--radius-lg);
-    padding: 1rem;
+    padding: 0.75rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3.5rem;
+    font-size: clamp(2rem, 8vh, 3.5rem);
     cursor: pointer;
     box-shadow: var(--shadow-card);
     transition: all 0.15s;
-    min-width: 100px;
-    min-height: 100px;
+    min-width: 80px;
+    min-height: 80px;
+    max-height: 25vh;
 }
 
 .image-card:hover {
