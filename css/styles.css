@@ -156,13 +156,14 @@ body {
 
 /* === VISTA JUEGO === */
 .game-header {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-    padding: 0.15rem 0.75rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    padding: 10px 20px;
+    height: 70px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    min-height: 40px;
-    box-shadow: 0 3px 10px rgba(139, 92, 246, 0.2);
+    justify-content: space-between;
+    color: white;
+    box-shadow: var(--shadow-md);
 }
 
 .header-left,
@@ -259,43 +260,52 @@ body {
 .main-layout {
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
-    gap: 1rem;
-    padding: 1rem;
+    gap: 20px;
+    padding: 15px;
     flex: 1;
     overflow: hidden;
+    height: calc(100vh - 100px);
+    /* Adjust based on header */
+    min-height: 0;
 }
 
 .panel {
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
+    background: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: var(--shadow-sm);
+    padding: 20px;
 }
 
 .panel-left {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    padding: 1rem;
+    justify-content: space-evenly;
+    align-items: center;
+    text-align: center;
 }
 
 .panel-right {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 15px;
 }
 
 /* Instrucción */
 .instruction-pill {
-    margin: 0.25rem auto;
-    padding: 0.25rem 1.2rem;
+    padding: 1rem 2rem;
     border-radius: var(--radius-full);
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-weight: 800;
+    font-size: 1.4rem;
     text-align: center;
-    box-shadow: var(--shadow-sm);
-    max-width: 90%;
+    background: white;
+    box-shadow: var(--shadow-md);
+    max-width: 95%;
+    color: var(--primary-dark);
+    border: 2px solid var(--primary-light);
 }
 
 .instruction-neutral {
@@ -340,12 +350,20 @@ body {
     border: none;
     color: white;
     font-weight: 800;
-    padding: 0.6rem 2rem;
-    border-radius: var(--radius-md);
+    padding: 1.2rem 3rem;
+    border-radius: var(--radius-xl);
     cursor: pointer;
-    font-size: 0.9rem;
-    box-shadow: 0 3px 0 var(--secondary-dark), 0 5px 12px rgba(249, 115, 22, 0.3);
+    font-size: 1.5rem;
+    box-shadow: 0 8px 0 var(--secondary-dark), 0 10px 25px rgba(249, 115, 22, 0.4);
     transition: all 0.1s;
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-game-action:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 0 var(--secondary-dark), 0 15px 30px rgba(249, 115, 22, 0.5);
 }
 
 .btn-game-action:active {
@@ -356,13 +374,15 @@ body {
 /* === PIZARRA DE ESCRITURA === */
 #pizarra-container {
     flex: 1;
-    background: var(--white);
-    border: 4px solid var(--primary-light);
-    border-radius: var(--radius-lg);
+    background: #064e3b;
+    /* Chalkboard green */
+    border: 10px solid #5d4037;
+    /* Wooden frame */
+    border-radius: var(--radius-xl);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    box-shadow: var(--shadow-float);
+    box-shadow: var(--shadow-lg), inset 0 0 50px rgba(0, 0, 0, 0.3);
 }
 
 .pizarra-header {
@@ -800,15 +820,16 @@ body {
 
 /* Palabra modelo grande para actividad Copia */
 .model-word-large {
-    font-size: 4rem;
+    font-size: 5rem;
+    font-weight: 800;
     color: var(--primary-dark);
     text-align: center;
-    padding: 1.5rem 3rem;
+    padding: 2rem 4rem;
     background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-    border-radius: var(--radius-lg);
-    border: 4px solid var(--primary);
-    letter-spacing: 0.15em;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+    border-radius: var(--radius-xl);
+    border: 6px solid var(--primary);
+    letter-spacing: 0.2em;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
 }
 
 /* Hueco para completar palabra */
@@ -816,22 +837,23 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
-    font-size: 3rem;
-    font-weight: 700;
+    gap: 0.75rem;
+    font-size: 4rem;
+    font-weight: 800;
 }
 
 .letter-gap {
-    width: 60px;
-    height: 70px;
-    border: 4px dashed var(--primary);
-    border-radius: var(--radius-md);
+    width: 80px;
+    height: 90px;
+    border: 5px dashed var(--primary);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.5rem;
+    font-size: 3.5rem;
     background: var(--primary-light);
     color: var(--primary-dark);
+    box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .letter-gap.filled {
