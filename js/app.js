@@ -18,6 +18,10 @@ class LectoApp {
             case: 'minusculas' // 'minusculas', 'mayusculas'
         };
 
+        // OPTIMIZACIÓN: Cleanup tasks y handlers
+        this.cleanupTasks = [];
+        this.canvasHandlers = null;
+
         // Vocabulario por niveles CON SÍLABAS CORRECTAS según gramática española
         this.vocabulary = {
             1: [
@@ -396,9 +400,70 @@ class LectoApp {
     }
 
     init() {
-        this.bindEvents();
+        this.autoScaleForSmartboard();
+        // loadFontSettings() removed - not defined and not needed for initial display
         this.initCanvas();
-        window.addEventListener('resize', () => this.resizeCanvas());
+        this.bindEvents();
+
+        // OPTIMIZACIÓN: Debounced resize
+        const debouncedResize = this.debounce(() => {
+            this.autoScaleForSmartboard();
+            this.resizeCanvas();
+        }, 150);
+
+        window.addEventListener('resize', debouncedResize);
+        this.cleanupTasks.push(() => window.removeEventListener('resize', debouncedResize));
+    }
+
+    /**
+     * Debounce utility - Delays execution until after wait time has elapsed
+     */
+    debounce(fn, delay = 300) {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    /**
+     * Auto-scale para smartboards - Escala automáticamente el contenido
+     * para que encaje perfectamente en cualquier resolución de pantalla
+     */
+    autoScaleForSmartboard() {
+        const appElement = document.getElementById('app');
+        if (!appElement) return;
+
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+
+        // Resolución de diseño base
+        const baseHeight = 1080;
+        const baseWidth = 1920;
+
+        // Calcular el factor de escala necesario
+        const scaleY = viewportHeight / baseHeight;
+        const scaleX = viewportWidth / baseWidth;
+
+        // Ajuste: Priorizamos que QUEPA VERTICALMENTE con un margen de seguridad
+        const safetyMargin = 0.97;
+        const scale = Math.min(scaleY, scaleX, 1) * safetyMargin;
+
+        // Aplicar escala si la pantalla es más pequeña que el diseño base o para asegurar el margen
+        if (scale < 0.99) {
+            appElement.style.transform = `scale(${scale})`;
+            appElement.style.transformOrigin = 'top center'; // Centrar horizontalmente al escalar
+            appElement.style.width = `${100 / scale}%`;
+            appElement.style.height = `${100 / scale}%`;
+
+            console.log(`⚙️ Auto-scale LectoAula con margen: ${(scale * 100).toFixed(1)}% (${viewportWidth}x${viewportHeight})`);
+        } else {
+            // Reset si la pantalla es suficientemente grande
+            appElement.style.transform = '';
+            appElement.style.width = '';
+            appElement.style.height = '';
+            appElement.style.transformOrigin = '';
+        }
     }
 
     bindEvents() {
@@ -454,13 +519,18 @@ class LectoApp {
 
     reportToPortal(ok) {
         if (window.parent !== window) {
-            window.parent.postMessage({
-                type: 'UPDATE_SCORE_DETAILED',
-                app: 'lecto',
-                score: this.score,
-                activity: this.activityNames[this.gameMode] || this.gameMode,
-                ok: ok
-            }, '*');
+            try {
+                window.parent.postMessage({
+                    type: 'UPDATE_SCORE_DETAILED',
+                    app: 'lecto',
+                    score: this.score,
+                    activity: this.activityNames[this.gameMode] || this.gameMode,
+                    ok: ok
+                }, '*');
+            } catch (error) {
+                // Silently fail when using file:// protocol (expected behavior)
+                console.log('Portal communication unavailable (file:// protocol)');
+            }
         }
     }
 
